@@ -10,7 +10,7 @@ const io = new Server({
   },
 });
 
-const Port = 2000;
+const Port = process.env.PORT||3001;
 const httpServer = http.createServer();
 io.attach(httpServer);
 httpServer.listen(Port, ()=>console.log('listening on port '+Port));
