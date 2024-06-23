@@ -1,25 +1,19 @@
 const http = require('http');
-const express = require('express');
-const {socketio, Server} = require('socket.io');
-const cors = require('cors');
+const { Server} = require('socket.io');
 
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./users').default;
 
-const router = require('./router');
 
-const app = express();
-const server = http.createServer();
 const io = new Server({
   cors: {
-    allowedHeaders: ["*"],
     origin: "*",
   },
 });
 
-const httpServer = http.createServer(server);
-const Port = 5000;
+const Port = 2000;
+const httpServer = http.createServer();
 io.attach(httpServer);
-app.use(router);
+httpServer.listen(Port, ()=>console.log('listening on port '+Port));
 
 io.on('connect', (socket) => {
   socket.on('join', ({ name, room }, callback) => {
@@ -29,8 +23,8 @@ io.on('connect', (socket) => {
 
     socket.join(user.room);
 
-    socket.emit('message', { user: 'admin', text: `${user.name}, welcome to room ${user.room}.`});
-    socket.broadcast.to(user.room).emit('message', { user: 'admin', text: `${user.name} has joined!` });
+    socket.emit('message', { user: 'admin', text: ${user.name}, welcome to room ${user.room}.});
+    socket.broadcast.to(user.room).emit('message', { user: 'admin', text: ${user.name} has joined! });
 
     io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
 
@@ -49,10 +43,8 @@ io.on('connect', (socket) => {
     const user = removeUser(socket.id);
 
     if(user) {
-      io.to(user.room).emit('message', { user: 'Admin', text: `${user.name} has left.` });
+      io.to(user.room).emit('message', { user: 'Admin', text: ${user.name} has left. });
       io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
     }
   })
 });
-
-httpServer.listen(Port, ()=>console.log('listening on port '+Port));
